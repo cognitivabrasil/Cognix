@@ -136,12 +136,12 @@ public class DocumentsController {
 //                msg = new MessageDto(MessageDto.ERROR, "Acesso negado! Você não ter permissão para deletar este documento.");
 //                return new ResponseEntity(msg, HttpStatus.FORBIDDEN);
 //            }
-        setOBAAFiles(d, request);
+        setOBAAFiles(d, dto);
         MessageDto msg = new MessageDto(MessageDto.SUCCESS, "Documento editado com sucesso");
         return new ResponseEntity<>(msg, HttpStatus.OK);
     }
 
-    private void setOBAAFiles(Document d, final HttpServletRequest request) {
+    private void setOBAAFiles(Document d, DocumentDto dto) {
         log.debug("Trying to save");
 
         Subject s;
@@ -156,7 +156,6 @@ public class DocumentsController {
                          nameSubject = retiraAcentos(key).toLowerCase();
                     }
                 }
-
             }
             log.trace("Assunto do OA: " + nameSubject);
             if (!nameSubject.equals("")) {
@@ -165,9 +164,8 @@ public class DocumentsController {
             }
         }
 
-        Map<String, String[]> parMap = request.getParameterMap();
 
-        OBAA obaa = OBAA.fromHashMap(parMap);
+        OBAA obaa = dto.getMetadata();
 
         // split the keywords
         List<Keyword> splittedKeywords = new ArrayList<>();
