@@ -54,6 +54,14 @@ public interface UserService {
      */
     User get(String login);
 
+    /**
+     * Gets a specific user only if the password matches.
+     *
+     * @param login Username of the user
+     * @param password Password supplied
+     * @return User object if password matches login, null otherwise
+     */
+    User authenticate(String login, String password);
 
     /**
      * Verify if the user is owner of any document

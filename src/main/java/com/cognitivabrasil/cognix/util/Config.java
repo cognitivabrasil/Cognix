@@ -9,23 +9,27 @@
  *  ******************************************************************************/
 package com.cognitivabrasil.cognix.util;
 
-import java.util.Properties;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Marcos Freitas Nunes <marcos@cognitivabrasil.com.br>
  */
+@Component
 public class Config {
+
+    private Environment env;
 
     public static final String FILE_PATH = "/var/cognitiva/repositorio/";
 
-    public static String getUrl(Properties config) {
-        String port = config.getProperty("Repositorio.port", "8080");
+    public String getUrl() {
+        String port = env.getProperty("repository.port", "8080");
         return ("http://"
-                + config.getProperty("Repositorio.hostname")
+                + env.getProperty("repository.hostname")
                 + (port.equals("80") ? "" : (":" + port))
                 // if port 80, dont put anything
-                + config.getProperty("Repositorio.rootPath", "/repositorio")
+                + env.getProperty("repository.rootPath", "/repositorio")
                 + "/documents/");
     }
 

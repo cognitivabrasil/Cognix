@@ -57,9 +57,10 @@ public class Document implements OaiDocument, java.io.Serializable {
     @DateTimeFormat(style = "M-")
     @Type(type = "org.jadira.usertype.dateandtime.joda.PersistentDateTime")
     private DateTime created;
+    @Column(columnDefinition = "boolean default false")
     private Boolean deleted;
     private Boolean active;
-    @Column(name = "obaaxml")
+    @Column(name = "obaaxml", columnDefinition = "TEXT")
     private String obaaXml;
 
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)

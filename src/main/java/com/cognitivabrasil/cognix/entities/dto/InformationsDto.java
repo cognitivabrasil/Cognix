@@ -7,24 +7,24 @@
  * contato@cognitivabrasil.com.br for information.
  */
 
-package com.cognitivabrasil.cognix.entities;
+package com.cognitivabrasil.cognix.entities.dto;
 
 /**
  *
  * @author Marcos Freitas Nunes <marcos@cognitivabrasil.com.br>
  */
-public class Informations {
+public class InformationsDto {
     private String title;
     private String value;
     private String msg;
 
-    public Informations(String title, String value, String msg) {
+    public InformationsDto(String title, String value, String msg) {
         this.title = title;
         this.value = value;
         this.msg = msg;
     }
 
-    public Informations(String title, String value) {
+    public InformationsDto(String title, String value) {
         this.title = title;
         this.value = value;
     }

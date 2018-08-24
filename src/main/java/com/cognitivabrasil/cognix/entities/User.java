@@ -7,7 +7,6 @@
  *  * http://www.gnu.org/licenses/gpl.html or for any other uses contact
  *  * contato@cognitivabrasil.com.br for information.
  *  ******************************************************************************/
-
 package com.cognitivabrasil.cognix.entities;
 
 import java.util.Arrays;
@@ -18,18 +17,21 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.PreRemove;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-
 @Entity
 @Table(name = "users")
-public class User {// implements UserDetails {
+public class User {
 
     public static final String MANAGE_DOC = "PERM_MANAGE_DOC";
     public static final String VIEW = "PERM_VIEW";
@@ -43,12 +45,14 @@ public class User {// implements UserDetails {
 
     private Integer id;
     private String login;
-    private String passwordMd5;
+    private String password;
     private String name;
     /* Internal representation of permission, as a string separated bu commas */
     private String permissionsInternal;
     private String role;
     private static final Map<String, String> ROLES;
+    private List<Document> documents;
+
     private Boolean deleted;
     private static final Map<String, String> PERMISSION_BY_ROLE;
 
@@ -61,19 +65,18 @@ public class User {// implements UserDetails {
         ROLES = Collections.unmodifiableSortedMap(myRoles);
     }
 
-    static{
+    static {
         PERMISSION_BY_ROLE = new HashMap<>();
-        PERMISSION_BY_ROLE.put(ROLE_ROOT,
-                User.MANAGE_USER + "," + User.VIEW + "," + User.MANAGE_DOC + "," + User.CREATE_DOC);
+        PERMISSION_BY_ROLE.put(ROLE_ROOT, User.MANAGE_USER + "," + User.VIEW + "," + User.MANAGE_DOC + "," + User.CREATE_DOC);
         PERMISSION_BY_ROLE.put(ROLE_DOC_ADMIN,
                 User.VIEW + "," + User.MANAGE_DOC + "," + User.CREATE_DOC);
-        PERMISSION_BY_ROLE.put(ROLE_AUTHOR,User.CREATE_DOC);
-        PERMISSION_BY_ROLE.put(ROLE_VIEW,User.VIEW);
+        PERMISSION_BY_ROLE.put(ROLE_AUTHOR, User.CREATE_DOC);
+        PERMISSION_BY_ROLE.put(ROLE_VIEW, User.VIEW);
     }
 
     public User() {
         login = "";
-        passwordMd5 = ""; // sonar: Credentials should not be hard-coded.
+        password = ""; // sonar: Credentials should not be hard-coded.
         name = "";
         permissionsInternal = "";
         role = "";
@@ -84,7 +87,6 @@ public class User {// implements UserDetails {
         this.login = login;
         this.name = name;
     }
-
 
     /**
      * @return the id
@@ -102,7 +104,7 @@ public class User {// implements UserDetails {
         this.id = id;
     }
 
-    @Column(name = "login")
+    @Column(name = "login", unique = true)
     public String getUsername() {
         return login;
     }
@@ -136,18 +138,16 @@ public class User {// implements UserDetails {
     /**
      * @return the passwordMd5
      */
-    @Column(name = "password")
-    protected String getPasswordMd5() {
-        return passwordMd5;
+    public String getPassword() {
+        return password;
     }
 
     /**
      * @param passwordMd5 the passwordMd5 to set
      */
-    protected void setPasswordMd5(String passwordMd5) {
-        this.passwordMd5 = passwordMd5;
+    public void setPassword(String passwordMd5) {
+        this.password = passwordMd5;
     }
-
 
     /**
      * @return the permissionsInternal
@@ -179,6 +179,7 @@ public class User {// implements UserDetails {
         setPermissionsInternal(getPermissions(role));
     }
 
+    @Column(columnDefinition = "boolean default false")
     public boolean isDeleted() {
         return deleted;
     }
@@ -194,20 +195,11 @@ public class User {// implements UserDetails {
      * @return the permissions
      */
     private String getPermissions(String role) {
-        Map<String, String> roles = new HashMap<>();
-        roles.put(ROLE_ROOT,
-                User.MANAGE_USER + "," + User.VIEW + "," + User.MANAGE_DOC + "," + User.CREATE_DOC);
-        roles.put(ROLE_DOC_ADMIN,
-                User.VIEW + "," + User.MANAGE_DOC + "," + User.CREATE_DOC);
-        roles.put(ROLE_AUTHOR,
-                User.CREATE_DOC);
-        roles.put(ROLE_VIEW,
-                User.VIEW);
         return PERMISSION_BY_ROLE.get(role);
 
     }
 
-    public boolean hasPermission(String permission){
+    public boolean hasPermission(String permission) {
         String permissions = getPermissions(getRole());
         List<String> roles = Arrays.asList(permissions.split(","));
         return roles.contains(permission);
@@ -232,6 +224,15 @@ public class User {// implements UserDetails {
         return ROLES;
     }
 
+    @OneToMany(cascade = CascadeType.PERSIST, orphanRemoval = false, mappedBy = "owner", fetch = FetchType.LAZY)
+    public List<Document> getDocuments() {
+        return documents;
+    }
+
+    public void setDocuments(List<Document> documents) {
+        this.documents = documents;
+    }
+
     /**
      * Gets the name of role
      *
@@ -252,20 +253,15 @@ public class User {// implements UserDetails {
 
         if (!Objects.equals(this.id, other.id)) {
             return false;
-        }
-        else if (!Objects.equals(this.login, other.login)) {
+        } else if (!Objects.equals(this.login, other.login)) {
             return false;
-        }
-        else if (!Objects.equals(this.passwordMd5, other.passwordMd5)) {
+        } else if (!Objects.equals(this.password, other.password)) {
             return false;
-        }
-        else if (!Objects.equals(this.name, other.name)) {
+        } else if (!Objects.equals(this.name, other.name)) {
             return false;
-        }
-        else if (!Objects.equals(this.permissionsInternal, other.permissionsInternal)) {
+        } else if (!Objects.equals(this.permissionsInternal, other.permissionsInternal)) {
             return false;
-        }
-        else if (!Objects.equals(this.role, other.role)) {
+        } else if (!Objects.equals(this.role, other.role)) {
             return false;
         }
         return true;
@@ -277,11 +273,21 @@ public class User {// implements UserDetails {
         int eleven = 11;
         hash = eleven * hash + (this.id != null ? this.id.hashCode() : 0);
         hash = eleven * hash + (this.login != null ? this.login.hashCode() : 0);
-        hash = eleven * hash + (this.passwordMd5 != null ? this.passwordMd5.hashCode() : 0);
+        hash = eleven * hash + (this.password != null ? this.password.hashCode() : 0);
         hash = eleven * hash + (this.name != null ? this.name.hashCode() : 0);
         hash = eleven * hash + (this.permissionsInternal != null ? this.permissionsInternal.hashCode() : 0);
         hash = eleven * hash + (this.role != null ? this.role.hashCode() : 0);
         return hash;
+    }
+
+    /**
+     * Antes de remover o usuário, busca todos os documentos e seta o owner como null.
+     */
+    @PreRemove
+    private void preRemove() {
+        for (Document d : getDocuments()) {
+            d.setOwner(null);
+        }
     }
 
 }

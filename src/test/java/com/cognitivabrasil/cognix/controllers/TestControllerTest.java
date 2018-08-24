@@ -12,7 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import static org.mockito.BDDMockito.given;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -26,7 +27,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Marcos Freitas Nunes <marcos@cognitivabrasil.com.br>
  */
 @RunWith(SpringRunner.class)
-@WebMvcTest(TestController.class)
+@SpringBootTest
+@AutoConfigureMockMvc
 public class TestControllerTest {
 
     @Autowired
@@ -40,6 +42,7 @@ public class TestControllerTest {
         given(userService.get(10)).willReturn(new User("mfnunes", "Marcos Nunes"));
 
         mvc.perform(MockMvcRequestBuilders.get("/test").contentType(MediaType.APPLICATION_JSON))
+//                .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username", equalTo("mfnunes")));
     }

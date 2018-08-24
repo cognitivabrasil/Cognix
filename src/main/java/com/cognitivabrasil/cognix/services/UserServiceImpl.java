@@ -6,14 +6,12 @@
  * http://www.gnu.org/licenses/gpl.html or for any other uses contact
  * contato@cognitivabrasil.com.br for information.
  */
-
 package com.cognitivabrasil.cognix.services;
 
 import com.cognitivabrasil.cognix.entities.User;
+import com.cognitivabrasil.cognix.repositories.DocumentRepository;
 import com.cognitivabrasil.cognix.repositories.UserRepository;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
@@ -25,12 +23,27 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
     @Autowired
     private UserRepository userRep;
 
-//    @Autowired
-//    private DocumentRepository docRep;
+    @Autowired
+    private DocumentRepository docRep;
+
+    @Override
+    public User authenticate(String login, String password) {
+
+        if (login == null) {
+            return null;
+        }
+
+        User u = get(login);
+        //TODO: Quando implementar a autenticação implementar este método aqui.
+        return u;
+//        if (u != null && u.authenticate(password)) {
+//            return u;
+//        }
+//        return null;
+    }
 
     @Override
     public User get(String login) {
@@ -71,11 +84,9 @@ public class UserServiceImpl implements UserService {
 
     }
 
-
     @Override
     public boolean hasDocument(User u) {
-        return true;
-//        return docRep.countByOwnerAndDeletedIsFalseAndActiveIsTrue(u) > 0;
+        return docRep.countByOwnerAndDeletedIsFalseAndActiveIsTrue(u) > 0;
     }
 
     @Override

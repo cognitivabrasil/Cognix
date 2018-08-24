@@ -1,10 +1,16 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (c) 2018 Cognitiva Brasil Tecnologias Educacionais
+ * http://www.cognitivabrasil.com.br
+ *
+ * All rights reserved. This program and the accompanying materials
+ * are made available either under the terms of the GNU Public License v3
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/gpl.html or for any other uses contact
+ * contato@cognitivabrasil.com.br for information.
  */
 package com.cognitivabrasil.cognix.entities.dto;
 
+import cognitivabrasil.obaa.OBAA;
 import com.cognitivabrasil.cognix.entities.Document;
 import com.cognitivabrasil.cognix.entities.Files;
 import java.util.List;
@@ -20,13 +26,13 @@ public class DocumentDto {
     private String isversion;
     private String hasVersion;
     private final List<Files> files;
-    private final String metadata;
+    private final OBAA metadata;
 
     public DocumentDto(Document d) {
         this.id = d.getId();
         this.obaaEntry = d.getObaaEntry();
         this.files = d.getFiles();
-        this.metadata = d.getMetadata().getJson();
+        this.metadata = d.getMetadata();
     }
 
     public Integer getId() {
@@ -57,7 +63,7 @@ public class DocumentDto {
         this.hasVersion = hasVersion;
     }
 
-    public String getMetadata() {
+    public OBAA getMetadata() {
         return metadata;
     }
 
