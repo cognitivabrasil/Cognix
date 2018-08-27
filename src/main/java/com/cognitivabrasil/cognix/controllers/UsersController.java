@@ -14,12 +14,12 @@ import com.cognitivabrasil.cognix.entities.dto.MessageDto;
 import com.cognitivabrasil.cognix.entities.dto.UserDto;
 import com.cognitivabrasil.cognix.entities.validators.UserEditPasswordValidator;
 import com.cognitivabrasil.cognix.entities.validators.UserEditValidator;
-import com.cognitivabrasil.cognix.entities.validators.UserNewValidator;
 import com.cognitivabrasil.cognix.services.UserService;
 import java.io.IOException;
 import java.security.Principal;
 import java.util.List;
 import static java.util.stream.Collectors.toList;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,12 +73,7 @@ public class UsersController {
      * @return
      */
     @PostMapping
-    public HttpEntity<UserDto> save(@RequestBody UserDto userDto, BindingResult bindingResult) {
-        UserNewValidator validator = new UserNewValidator(userService);
-        validator.validate(userDto, bindingResult);
-        if (bindingResult.hasErrors()) {
-            return new ResponseEntity(userDto, HttpStatus.BAD_REQUEST);
-        }
+    public HttpEntity<UserDto> save(@Valid @RequestBody UserDto userDto) {
 
         User u = userDto.toUser();
         userService.save(u);
@@ -218,8 +213,9 @@ public class UsersController {
             userService.activate(userService.get(id));
             return new ResponseEntity(new MessageDto(MessageDto.SUCCESS, "Usuário ativado com sucesso"), HttpStatus.OK);
         } catch (DataAccessException e) {
+            log.error("Erro ao reativar o usuário: {}",id, e);
             MessageDto msg = new MessageDto(MessageDto.ERROR, "Erro ao reativar o usuário");
-            return new ResponseEntity(msg, HttpStatus.OK);
+            return new ResponseEntity(msg, HttpStatus.BAD_REQUEST);
         }
     }
 

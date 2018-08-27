@@ -10,20 +10,30 @@
 package com.cognitivabrasil.cognix.entities.dto;
 
 import com.cognitivabrasil.cognix.entities.User;
+import com.cognitivabrasil.cognix.entities.validators.PasswordsEqualConstraint;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  *
  * @author marcos
  */
+@PasswordsEqualConstraint(message = "passwords are not equal")
 public class UserDto {
 
+    @NotEmpty
     private String username;
+    @NotEmpty
     private String name;
+    @NotEmpty
     private String role;
+    @NotEmpty(message = "Informar uma senha com no mínimo 5 caracteres")
+    @Size(min = 5, message = "A senha tem que ter no mínimo 5 caracteres")
     private String password;
+    @NotEmpty(message = "Necessário confirmar a senha")
+    @Size(min = 5, message = "A senha tem que ter no mínimo 5 caracteres")
     private String confirmPass;
-    private String currentPass;
     private Integer id;
 
     public UserDto() {
@@ -90,24 +100,6 @@ public class UserDto {
 
     public void setConfirmPass(String confirmPass) {
         this.confirmPass = confirmPass;
-    }
-
-    /**
-     * Used only on editing user, to confirm the password with the database
-     *
-     * @return The current password set in the edit form
-     */
-    public String getCurrentPass() {
-        return currentPass;
-    }
-
-    /**
-     * Used only on editing user, to confirm the password with the database
-     *
-     * @param currentPass The current password
-     */
-    public void setCurrentPass(String currentPass) {
-        this.currentPass = currentPass;
     }
 
     public User updateUser(User u) {
