@@ -83,7 +83,7 @@ public class UsersController {
         User u = userDto.toUser();
         userService.save(u);
 
-        return new ResponseEntity(HttpStatus.OK);
+        return new ResponseEntity(HttpStatus.CREATED);
     }
 
     /**
@@ -93,7 +93,7 @@ public class UsersController {
      * @return
      */
     @GetMapping(value = "/{id}")
-    public HttpEntity<UserDto> edit(@PathVariable("id") int id) {
+    public HttpEntity<UserDto> get(@PathVariable("id") int id) {
         User u = userService.get(id);
         return new ResponseEntity(new UserDto(u), HttpStatus.OK);
     }

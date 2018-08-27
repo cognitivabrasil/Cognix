@@ -10,6 +10,7 @@
 package com.cognitivabrasil.cognix.entities.dto;
 
 import com.cognitivabrasil.cognix.entities.User;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 /**
  *
@@ -37,10 +38,9 @@ public class UserDto {
     }
 
     public UserDto(User u) {
+        this.id = u.getId();
         this.username = u.getUsername();
         this.name = u.getName();
-//        this.password = u.getPassword();
-        this.id = u.getId();
         this.role = u.getRole();
     }
 
@@ -117,9 +117,9 @@ public class UserDto {
         u.setName(name);
         u.setUsername(username);
         u.setRole(role);
-//        if (!isBlank(password)) {
-//            u.setPassword(password);
-//        }
+        if (!isBlank(password)) {
+            u.setPassword(password);
+        }
         return u;
     }
 
