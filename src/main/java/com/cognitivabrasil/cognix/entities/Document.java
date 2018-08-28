@@ -13,6 +13,7 @@ package com.cognitivabrasil.cognix.entities;
 
 import ORG.oclc.oai.models.OaiDocument;
 import cognitivabrasil.obaa.OBAA;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
@@ -44,7 +45,7 @@ import org.springframework.format.annotation.DateTimeFormat;
  */
 @Entity
 @Table(name = "documents")
-public class Document implements OaiDocument, java.io.Serializable {
+public class Document implements OaiDocument, Serializable {
 
     @Transient
     private final Logger LOG = LoggerFactory.getLogger(Document.class);
@@ -88,7 +89,7 @@ public class Document implements OaiDocument, java.io.Serializable {
         return this.id;
     }
 
-    protected void setId(Integer id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -210,7 +211,7 @@ public class Document implements OaiDocument, java.io.Serializable {
 
     public String getTitle() {
         if (getMetadata().getGeneral() == null || getMetadata().getGeneral().getTitles().isEmpty()) {
-            return "Sem título";
+            return null;
         }
         return getMetadata().getGeneral().getTitles().get(0);
     }

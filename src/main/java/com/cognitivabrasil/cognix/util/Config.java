@@ -9,6 +9,7 @@
  *  ******************************************************************************/
 package com.cognitivabrasil.cognix.util;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Component;
 
@@ -19,6 +20,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class Config {
 
+    @Autowired
     private Environment env;
 
     public static final String FILE_PATH = "/var/cognitiva/repositorio/";

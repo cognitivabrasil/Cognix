@@ -1,7 +1,10 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (c) 2016 Cognitiva Brasil - Tecnologias educacionais.
+ * All rights reserved. This program and the accompanying materials
+ * are made available either under the terms of the GNU Public License v3
+ * which accompanies this distribution, and is available at
+ * http://www.gnu.org/licenses/gpl.html or for any other uses contact
+ * contato@cognitivabrasil.com.br for information.
  */
 package com.cognitivabrasil.cognix.controllers;
 
@@ -124,10 +127,10 @@ public class DocumentsController {
     }
 
     /**
-     * Busca um documento pelo id.
+     * Busca um documento pelo id. Seta o idioma do obaa para pt-BT, então os metadados serão traduzidos.
      *
-     * @param id
-     * @return Dto do documento informado.
+     * @param id Identificador do documento que será buscado.
+     * @return Dto com os dados do documento solicitado.
      */
     @GetMapping("/{id}")
     public HttpEntity<DocumentDto> get(@PathVariable Integer id) {
@@ -144,7 +147,7 @@ public class DocumentsController {
                 switch (rel.getKind().getText()) {
                     case Kind.IS_VERSION_OF:
                         if (!rel.getResource().getIdentifier().isEmpty()) {
-                            dto.setIsversion(rel.getResource().getIdentifier().get(0).getEntry());
+                            dto.setIsVersion(rel.getResource().getIdentifier().get(0).getEntry());
                         }
                         break;
                     case Kind.HAS_VERSION:

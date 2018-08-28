@@ -18,7 +18,7 @@ import com.cognitivabrasil.cognix.entities.Document;
  */
 public class DocumentTinyDto {
 
-    private final int id;
+    private final Integer id;
     private final String title;
 
     public DocumentTinyDto(int id, String title) {

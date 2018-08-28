@@ -23,7 +23,7 @@ public class DocumentDto {
 
     private final Integer id;
     private final String obaaEntry;
-    private String isversion;
+    private String isVersion;
     private String hasVersion;
     private final List<Files> files;
     private final OBAA metadata;
@@ -47,12 +47,12 @@ public class DocumentDto {
         return files;
     }
 
-    public String getIsversion() {
-        return isversion;
+    public String getIsVersion() {
+        return isVersion;
     }
 
-    public void setIsversion(String isversion) {
-        this.isversion = isversion;
+    public void setIsVersion(String isversion) {
+        this.isVersion = isversion;
     }
 
     public String getHasVersion() {
