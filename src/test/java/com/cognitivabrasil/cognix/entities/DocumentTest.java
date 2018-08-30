@@ -4,7 +4,7 @@
  *  * All rights reserved. This program and the accompanying materials
  *  * are made available either under the terms of the GNU Public License v3
  *  * which accompanies this distribution, and is available at
- *  * http://www.gnu.org/licenses/gpl.html or for any other uses contact 
+ *  * http://www.gnu.org/licenses/gpl.html or for any other uses contact
  *  * contato@cognitivabrasil.com.br for information.
  *  ******************************************************************************
  *
@@ -29,7 +29,7 @@ public class DocumentTest {
     public void testXmlDeserialization() throws IOException {
         Document d = new Document();
 
-        String obaaXml = FileUtils.readFileToString(new File("src/test/resources/obaa1.xml"),"UTF-8");
+        String obaaXml = FileUtils.readFileToString(new File("src/test/resources/obaa1.xml"), "UTF-8");
 
         d.setObaaXml(obaaXml);
 
@@ -40,8 +40,7 @@ public class DocumentTest {
     }
 
     /**
-     * Test that calling getMetadata on an object that does not have XML
-     * metadata throws exception.
+     * Test that calling getMetadata on an object that does not have XML metadata throws exception.
      */
     @Ignore("We are currently creating a new Metadata if it doesnt exist yet.")
     @Test(expected = IllegalStateException.class)
@@ -77,13 +76,8 @@ public class DocumentTest {
     public void testGetTitle() {
         Document d = new Document();
 
-        assertThat(d.getTitle(), notNullValue());
-        assertThat(d.getTitle(), equalTo("Sem título"));
-
-        d = new Document();
         d.setObaaXml("<obaa></obaa>");
-        assertThat(d.getTitle(), notNullValue());
-        assertThat(d.getTitle(), equalTo("Sem título"));
+        assertThat(d.getTitle(), nullValue());
 
         d = new Document();
 
@@ -91,14 +85,12 @@ public class DocumentTest {
                 + "<obaa:general><obaa:keyword>TCP</obaa:keyword><obaa:structure>atomic</obaa:structure></obaa:general></obaa:obaa>");
         assertThat(d.getMetadata().getGeneral(), notNullValue());
 
-        assertThat(d.getTitle(), notNullValue());
-        assertThat(d.getTitle(), equalTo("Sem título"));
+        assertThat(d.getTitle(), nullValue());
     }
 
     @Test
     /**
-     * verifica se as operações feitas em getMetadata não alteram o OBAA, se já
-     * existir.
+     * verifica se as operações feitas em getMetadata não alteram o OBAA, se já existir.
      */
     public void testGetMetadata() {
         Document d = new Document();

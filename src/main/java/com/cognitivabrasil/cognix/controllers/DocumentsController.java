@@ -195,6 +195,7 @@ public class DocumentsController {
         } catch (DataAccessException e) {
             log.error("Não foi possivel excluir o documento.", e);
             msg = new MessageDto(MessageDto.ERROR, "Erro ao excluir o documento.", "");
+            return new ResponseEntity(msg, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         return new ResponseEntity(msg, HttpStatus.OK);
     }
@@ -221,32 +222,30 @@ public class DocumentsController {
      */
     @PutMapping("/{id}")
     public HttpEntity<MessageDto> editDo(@PathVariable("id") Integer id, @RequestBody DocumentDto dto) throws IOException {
-        log.debug("Editing document: {}", dto.getId());
+        log.debug("Editing document: {}", id);
         Document d = docService.get(id);
         //TODO: Security. Isso aqui tem que implementar depois de ter o security.
 //            if (!isManagerForThisDocument(d, request)) {
 //                msg = new MessageDto(MessageDto.ERROR, "Acesso negado! Você não ter permissão para deletar este documento.");
 //                return new ResponseEntity(msg, HttpStatus.FORBIDDEN);
 //            }
-        setOBAAFiles(d, dto);
+        setOBAAFiles(d, dto.getMetadata());
         MessageDto msg = new MessageDto(MessageDto.SUCCESS, "Documento editado com sucesso");
         return new ResponseEntity<>(msg, HttpStatus.OK);
     }
 
-    private void setOBAAFiles(Document d, DocumentDto dto) {
+    private void setOBAAFiles(Document d, OBAA obaa) {
         log.debug("Trying to save");
-
-        OBAA obaa = dto.getMetadata();
 
         // split the keywords
         List<Keyword> splittedKeywords = new ArrayList<>();
         if (!obaa.getGeneral().getKeywords().isEmpty()) {
 
-            for (String k : obaa.getGeneral().getKeywords()) {
+            obaa.getGeneral().getKeywords().forEach((k) -> {
                 for (String nk : k.split("\\s*[,;]\\s*")) {
                     splittedKeywords.add(new Keyword(nk));
                 }
-            }
+            });
             obaa.getGeneral().setKeywords(splittedKeywords);
         }
 
@@ -800,7 +799,7 @@ public class DocumentsController {
 
             //TODO: pegar aqui o email do usuário logado.
 //        doc.setOwner(UsersController.getCurrentUser());
-            setOBAAFiles(doc, dto);
+            setOBAAFiles(doc, dto.getMetadata());
 
             msg = new MessageDto(MessageDto.SUCCESS, "Documento salvo com sucesso");
         } catch (DataAccessException e) {

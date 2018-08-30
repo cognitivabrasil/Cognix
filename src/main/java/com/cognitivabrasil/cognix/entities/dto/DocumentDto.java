@@ -21,12 +21,16 @@ import java.util.List;
  */
 public class DocumentDto {
 
-    private final Integer id;
-    private final String obaaEntry;
+    private Integer id;
+    private String obaaEntry;
     private String isVersion;
     private String hasVersion;
-    private final List<Files> files;
-    private final OBAA metadata;
+    private List<Files> files;
+    private OBAA metadata;
+
+    public DocumentDto() {
+    }
+    
 
     public DocumentDto(Document d) {
         this.id = d.getId();

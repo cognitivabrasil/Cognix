@@ -19,12 +19,14 @@ import cognitivabrasil.obaa.Relation.Resource;
 import com.cognitivabrasil.cognix.entities.Document;
 import com.cognitivabrasil.cognix.entities.Files;
 import com.cognitivabrasil.cognix.entities.User;
+import com.cognitivabrasil.cognix.entities.dto.MessageDto;
 import com.cognitivabrasil.cognix.services.DocumentService;
 import com.cognitivabrasil.cognix.util.Config;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -32,6 +34,7 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import org.mockito.InjectMocks;
@@ -40,12 +43,15 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.dao.DataRetrievalFailureException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -90,7 +96,7 @@ public class DocumentControllerTest {
         file.setName("thumbnail.png");
         file.setContentType("image/png");
         file.setDocument(d);
-        file.setLocation("http://addrs/thumbnail.png");
+        file.setLocation("http://addrs/");
         file.setPartialSize(1024);
         d.setFiles(Arrays.asList(file));
         d.setOwner(new User("mfnunes", "Marcos Nunes"));
@@ -199,5 +205,52 @@ public class DocumentControllerTest {
                 .andExpect(jsonPath("$.message",
                         equalTo("Documento excluido com sucesso, mas os seus arquivos não foram encontrados")));
         verify(docService).delete(d);
+    }
+
+    @Test
+    public void testDeleteError() throws Exception {
+        doThrow(new DataRetrievalFailureException("Fake error")).when(docService).delete(d);
+        mvc.perform(delete("/documents/10"))
+                .andExpect(status().is5xxServerError())
+                .andExpect(jsonPath("$.type", equalTo(MessageDto.ERROR)))
+                .andExpect(jsonPath("$.message", equalTo("Erro ao excluir o documento.")));
+        verify(docService).delete(d);
+    }
+
+    /**
+     * O Get do edit não deve traduzir os metadados.
+     *
+     * @throws Exception
+     */
+    @Test
+    public void testGetEdit() throws Exception {
+        Relation r = new Relation();
+        r.setKind(Kind.IS_VERSION_OF);
+        d.getMetadata().addRelation(r);
+        mvc.perform(get("/documents/10/edit"))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(jsonPath("$.obaaEntry", equalTo(d.getObaaEntry())))
+                .andExpect(jsonPath("$.metadata.relations[0].kind", equalTo("isversionof")));
+    }
+
+    @Test
+    public void testEdit() throws Exception {
+        String json = "{\"id\":10,\"obaaEntry\":\"kkknãoaltera\",\"isVersion\":null,\"hasVersion\":null,\"files\":[{\"id\":1,\"name\":\"thumbnail.png\",\"location\":\"http://addrs/thumbnail.png\",\"contentType\":\"image/png\",\"sizeInBytes\":1024,\"randomName\":null,\"sizeFormatted\":\"1 KB\"}],\"metadata\":{\"general\":{\"titles\":[\"Título aleatório\"],\"identifiers\":[{\"catalog\":\"URI\",\"entry\":\"www.cognitivabrasil.com.br/12\"}]},\"technical\":{\"relations\":[{\"kind\":\"hasversion\"}]}}}";
+
+        mvc.perform(put("/documents/10").content(json).contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        ArgumentCaptor<Document> argument = ArgumentCaptor.forClass(Document.class);
+        verify(docService).save(argument.capture());
+
+        Document result = argument.getValue();
+        assertThat(result.getId(), equalTo(10));
+        assertThat(result.getObaaEntry(), equalTo(d.getObaaEntry()));
+        assertThat(result.getFiles(), hasSize(1));
+        assertThat(result.getOwner(), equalTo(d.getOwner()));
+        assertThat(result.isActive(), equalTo(d.isActive()));
+        assertThat(result.isDeleted(), equalTo(d.isDeleted()));
+        Files f = result.getFiles().get(0);
+        assertThat(f.getLocation(), equalTo(d.getFiles().get(0).getLocation()));
     }
 }
