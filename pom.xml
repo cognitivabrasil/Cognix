@@ -117,6 +117,20 @@
         </dependency>
         <!--Fim das dependencias do joda-->
 
+        <!--dependencia para documentação-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger2</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+
+        <!--swagger ui-->
+        <dependency>
+            <groupId>io.springfox</groupId>
+            <artifactId>springfox-swagger-ui</artifactId>
+            <version>2.7.0</version>
+        </dependency>
+
 <!--        SWORD
         <dependency>
             <groupId>org.swordapp</groupId>
