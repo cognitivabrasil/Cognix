@@ -46,6 +46,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 /**
  *
@@ -53,6 +54,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RequestMapping("/files")
 @RestController
+@CrossOrigin(origins = "*")
 public class FileController {
 
     private final Logger LOG = LoggerFactory.getLogger(FileController.class);
@@ -149,7 +151,7 @@ public class FileController {
                     if (item.isFormField()) {
                         String attribute = item.getFieldName();
                         String value = Streams.asString(input);
-
+                        LOG.error(attribute);
                         switch (attribute) {
                             case "chunks":
                                 this.chunks = Integer.parseInt(value);

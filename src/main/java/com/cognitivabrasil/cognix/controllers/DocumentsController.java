@@ -84,6 +84,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.CrossOrigin;
 
 /**
  * Document's controller to get, put and update Cognix documents.
@@ -91,6 +92,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Marcos Freitas Nunes <marcos@cognitivabrasil.com.br>
  */
 @RestController
+@CrossOrigin(origins = "*")
 @RequestMapping("/documents")
 public class DocumentsController {
 
