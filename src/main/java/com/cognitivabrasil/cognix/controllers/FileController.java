@@ -16,20 +16,17 @@ import com.cognitivabrasil.cognix.entities.dto.MessageDto;
 import com.cognitivabrasil.cognix.services.DocumentService;
 import com.cognitivabrasil.cognix.services.FileService;
 import com.cognitivabrasil.cognix.util.Config;
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.List;
+import java.util.Collection;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.fileupload.FileItem;
-import org.apache.commons.fileupload.disk.DiskFileItemFactory;
+import javax.servlet.http.Part;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
@@ -133,6 +130,8 @@ public class FileController {
             file = new Files();
             file.setSizeInBytes(0L);
         }
+        
+        //https://stackoverflow.com/questions/12127531/how-to-get-multipartentity-from-httpservletrequest
 
         Integer docId = null;
         String docPath = null;
@@ -141,72 +140,75 @@ public class FileController {
 
         if (isMultipart) {
             try {
-                ServletFileUpload x = new ServletFileUpload(new DiskFileItemFactory());
-                List<FileItem> items = x.parseRequest(request);
-
-                for (FileItem item : items) {
-                    InputStream input = item.getInputStream();
-
-                    // Handle a form field.
-                    if (item.isFormField()) {
-                        String attribute = item.getFieldName();
-                        String value = Streams.asString(input);
-                        LOG.error(attribute);
-                        switch (attribute) {
-                            case "chunks":
-                                this.chunks = Integer.parseInt(value);
-                                break;
-                            case "chunk":
-                                this.chunk = Integer.parseInt(value);
-                                break;
-                            case "filename":
-                                file.setName(value);
-                                break;
-                            case "docId":
-                                if (value.isEmpty()) {
-                                    throw new org.apache.commons.fileupload.FileUploadException("Não foi informado o id do documento.");
-                                }
-                                docId = Integer.parseInt(value);
-                                docPath = Config.FILE_PATH + "/" + docId;
-                                File documentPath = new File(docPath);
-                                // cria o diretorio
-                                documentPath.mkdirs();
-
-                                break;
-                            default:
-                                break;
-                        }
-
-                    } // Handle a multi-part MIME encoded file.
-                    else {
-                        try {
-
-                            File uploadFile = new File(docPath, item.getName());
-                            BufferedOutputStream bufferedOutput;
-                            bufferedOutput = new BufferedOutputStream(new FileOutputStream(uploadFile, true));
-
-                            byte[] data = item.get();
-                            bufferedOutput.write(data);
-                            bufferedOutput.close();
-                        } catch (Exception e) {
-                            LOG.error("Erro ao salvar o arquivo.", e);
-                            file = null;
-                            throw e;
-                        } finally {
-                            if (input != null) {
-                                try {
-                                    input.close();
-                                } catch (IOException e) {
-                                    LOG.error("Erro ao fechar o ImputStream", e);
-                                }
-                            }
-
-                            file.setName(item.getName());
-                            file.setContentType(item.getContentType());
-                            file.setPartialSize(item.getSize());
-                        }
-                    }
+                Collection<Part> input = request.getParts();
+                
+                for (Part p:input){
+                    p.getName();
+                    InputStream inputStream = p.getInputStream();
                 }
+                    
+
+//
+//                    // Handle a form field.
+//                    if (item.isFormField()) {
+//                        String attribute = item.getFieldName();
+//                        String value = Streams.asString(input);
+//                        LOG.error(attribute);
+//                        switch (attribute) {
+//                            case "chunks":
+//                                this.chunks = Integer.parseInt(value);
+//                                break;
+//                            case "chunk":
+//                                this.chunk = Integer.parseInt(value);
+//                                break;
+//                            case "filename":
+//                                file.setName(value);
+//                                break;
+//                            case "docId":
+//                                if (value.isEmpty()) {
+//                                    throw new org.apache.commons.fileupload.FileUploadException("Não foi informado o id do documento.");
+//                                }
+//                                docId = Integer.parseInt(value);
+//                                docPath = Config.FILE_PATH + "/" + docId;
+//                                File documentPath = new File(docPath);
+//                                // cria o diretorio
+//                                documentPath.mkdirs();
+//
+//                                break;
+//                            default:
+//                                break;
+//                        }
+//
+//                    } // Handle a multi-part MIME encoded file.
+//                    else {
+//                        try {
+//
+//                            File uploadFile = new File(docPath, item.getName());
+//                            BufferedOutputStream bufferedOutput;
+//                            bufferedOutput = new BufferedOutputStream(new FileOutputStream(uploadFile, true));
+//
+//                            byte[] data = item.get();
+//                            bufferedOutput.write(data);
+//                            bufferedOutput.close();
+//                        } catch (Exception e) {
+//                            LOG.error("Erro ao salvar o arquivo.", e);
+//                            file = null;
+//                            throw e;
+//                        } finally {
+//                            if (input != null) {
+//                                try {
+//                                    input.close();
+//                                } catch (IOException e) {
+//                                    LOG.error("Erro ao fechar o ImputStream", e);
+//                                }
+//                            }
+//
+//                            file.setName(item.getName());
+//                            file.setContentType(item.getContentType());
+//                            file.setPartialSize(item.getSize());
+//                        }
+//                    }
+//                }
 
                 if ((this.chunk == this.chunks - 1) || this.chunks == 0) {
                     file.setLocation(docPath + "/" + file.getName());
@@ -216,7 +218,7 @@ public class FileController {
                     fileService.save(file);
                     file = null;
                 }
-            } catch (org.apache.commons.fileupload.FileUploadException | IOException | NumberFormatException e) {
+            } catch (IOException | NumberFormatException e) {
                 responseString = RESP_ERROR;
                 LOG.error("Erro ao salvar o arquivo", e);
                 file = null;

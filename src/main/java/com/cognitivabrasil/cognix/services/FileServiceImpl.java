@@ -46,6 +46,10 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public void save(Files f) {
+        LOG.error("\n\n\n\n");
+        LOG.error(f.getName());
+        LOG.error(f.getDocument().getObaaEntry());
+
         fileRep.save(f);
     }
 
