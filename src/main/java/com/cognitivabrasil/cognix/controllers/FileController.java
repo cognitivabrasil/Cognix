@@ -16,9 +16,11 @@ import com.cognitivabrasil.cognix.entities.dto.MessageDto;
 import com.cognitivabrasil.cognix.services.DocumentService;
 import com.cognitivabrasil.cognix.services.FileService;
 import com.cognitivabrasil.cognix.util.Config;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collection;
@@ -137,87 +139,66 @@ public class FileController {
         String docPath = null;
         String responseString = RESP_SUCCESS;
         boolean isMultipart = ServletFileUpload.isMultipartContent(request);
-
+        
         if (isMultipart) {
             try {
                 Collection<Part> input = request.getParts();
                 
                 for (Part p:input){
-                    p.getName();
+                    
                     InputStream inputStream = p.getInputStream();
+                    String value = Streams.asString(inputStream);
+                    
+                    switch(p.getName()){
+                        case "filename":
+                            file.setName(value);
+                                
+                            
+                            break;
+                        case "docId":
+                        
+                                docId = (Integer.parseInt(value));
+                                
+                                docPath = Config.FILE_PATH  + docId + "/";
+                                File documentPath = new File(docPath);
+                                // cria o diretorio
+                                documentPath.mkdirs();
+                                break;
+                        
+                        
+                        
+                        default:
+                            String name = file.getName();
+                            String thumb = "thumbnail";
+                            if (!name.equals(thumb)){
+                                name = p.getSubmittedFileName();
+                                file.setName(name);
+                                file.setId(docId);
+                                file.setLocation(docPath + name);
+                                String x = file.getLocation();
+                                Integer z = file.getId();
+                                if (docId != null) {
+                                    file.setDocument(documentsService.get(docId));
+                                }
+                                fileService.save(file);
+                                Files f = fileService.get(docId);
+                                String y = f.getLocation();
+                            }
+                            p.write(docPath + name);
+                            
+                    }
+                    
+                    
                 }
                     
 
-//
-//                    // Handle a form field.
-//                    if (item.isFormField()) {
-//                        String attribute = item.getFieldName();
-//                        String value = Streams.asString(input);
-//                        LOG.error(attribute);
-//                        switch (attribute) {
-//                            case "chunks":
-//                                this.chunks = Integer.parseInt(value);
-//                                break;
-//                            case "chunk":
-//                                this.chunk = Integer.parseInt(value);
-//                                break;
-//                            case "filename":
-//                                file.setName(value);
-//                                break;
-//                            case "docId":
-//                                if (value.isEmpty()) {
-//                                    throw new org.apache.commons.fileupload.FileUploadException("Não foi informado o id do documento.");
-//                                }
-//                                docId = Integer.parseInt(value);
-//                                docPath = Config.FILE_PATH + "/" + docId;
-//                                File documentPath = new File(docPath);
-//                                // cria o diretorio
-//                                documentPath.mkdirs();
-//
-//                                break;
-//                            default:
-//                                break;
-//                        }
-//
-//                    } // Handle a multi-part MIME encoded file.
-//                    else {
-//                        try {
-//
-//                            File uploadFile = new File(docPath, item.getName());
-//                            BufferedOutputStream bufferedOutput;
-//                            bufferedOutput = new BufferedOutputStream(new FileOutputStream(uploadFile, true));
-//
-//                            byte[] data = item.get();
-//                            bufferedOutput.write(data);
-//                            bufferedOutput.close();
-//                        } catch (Exception e) {
-//                            LOG.error("Erro ao salvar o arquivo.", e);
-//                            file = null;
-//                            throw e;
-//                        } finally {
-//                            if (input != null) {
-//                                try {
-//                                    input.close();
-//                                } catch (IOException e) {
-//                                    LOG.error("Erro ao fechar o ImputStream", e);
-//                                }
-//                            }
-//
-//                            file.setName(item.getName());
-//                            file.setContentType(item.getContentType());
-//                            file.setPartialSize(item.getSize());
-//                        }
-//                    }
-//                }
 
-                if ((this.chunk == this.chunks - 1) || this.chunks == 0) {
-                    file.setLocation(docPath + "/" + file.getName());
-                    if (docId != null) {
-                        file.setDocument(documentsService.get(docId));
-                    }
-                    fileService.save(file);
-                    file = null;
-                }
+                
+                  
+                    
+                file = null;     
+                    
+                
             } catch (IOException | NumberFormatException e) {
                 responseString = RESP_ERROR;
                 LOG.error("Erro ao salvar o arquivo", e);
