@@ -152,7 +152,6 @@ public class FileController {
                     switch(p.getName()){
                         case "filename":
                             file.setName(value);
-                                
                             
                             break;
                         case "docId":
@@ -170,21 +169,25 @@ public class FileController {
                         default:
                             String name = file.getName();
                             String thumb = "thumbnail";
+                            
+                            if (name.equals(thumb)){
+                                p.write(docPath + name);
+                                file = null;
+                            }
                             if (!name.equals(thumb)){
                                 name = p.getSubmittedFileName();
                                 file.setName(name);
-                                file.setId(docId);
                                 file.setLocation(docPath + name);
-                                String x = file.getLocation();
-                                Integer z = file.getId();
-                                if (docId != null) {
-                                    file.setDocument(documentsService.get(docId));
-                                }
+                                Document docx = documentsService.get(docId);
+                                
+                                
+                                file.setDocument(docx);
+                                
+                                p.write(docPath + name);
                                 fileService.save(file);
-                                Files f = fileService.get(docId);
-                                String y = f.getLocation();
+                                file = null;
                             }
-                            p.write(docPath + name);
+                            
                             
                     }
                     
@@ -195,8 +198,6 @@ public class FileController {
 
                 
                   
-                    
-                file = null;     
                     
                 
             } catch (IOException | NumberFormatException e) {

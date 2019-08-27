@@ -9,6 +9,7 @@
  *  ******************************************************************************/
 package com.cognitivabrasil.cognix.services;
 
+import com.cognitivabrasil.cognix.entities.Document;
 import com.cognitivabrasil.cognix.entities.Files;
 import com.cognitivabrasil.cognix.repositories.FileRepository;
 import java.io.IOException;
@@ -48,7 +49,9 @@ public class FileServiceImpl implements FileService {
     public void save(Files f) {
         LOG.error("\n\n\n\n");
         LOG.error(f.getName());
-        LOG.error(f.getDocument().getObaaEntry());
+        Document doc = f.getDocument();
+        String s = doc.getOaiIdentifier();
+        LOG.error(doc.getObaaEntry());
 
         fileRep.save(f);
     }
