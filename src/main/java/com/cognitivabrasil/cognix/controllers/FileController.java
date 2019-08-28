@@ -46,7 +46,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
-
+import java.io.File;
 /**
  *
  * @author Marcos Freitas Nunes <marcosn@gmail.com>
@@ -67,21 +67,27 @@ public class FileController {
     private static final String RESP_SUCCESS = "{\"jsonrpc\" : \"2.0\", \"result\" : \"success\", \"id\" : \"id\"}";
     private static final String RESP_ERROR = "{\"jsonrpc\" : \"2.0\", \"error\" : {\"code\": 101, \"message\": \"Falha ao abrir o input stream.\"}, \"id\" : \"id\"}";
     public static final String DEFAULT_THUMBNAIL_PATH = "./src/main/resources/default-thumbnail.png";
-
+    
     @GetMapping(value = "/{id}")
     public void getFile(@PathVariable("id") int id, HttpServletResponse response) throws IOException {
-        Files f = fileService.get(id);
-        if (f == null) {
-            response.sendError(HttpServletResponse.SC_GONE, "O arquivo solicitado não foi encontrado.");
-        } else {
-            String fileName = f.getLocation();
+        File fi = new File(Config.FILE_PATH + id);
+        
+        String[] paths = fi.list();
+        String filename = "";
+        
+        for(String path:paths){
+           if(!path.equals("thumbnail")){
+               filename = path;
+           }
+        }
 
-            try {
+
+        try {
                 // get your file as InputStream
-                InputStream is = new FileInputStream(new File(fileName));
+                InputStream is = new FileInputStream(new File(Config.FILE_PATH + id + "/" + filename));
 
-                response.setHeader("Content-Disposition", "attachment; filename=" + f.getName());
-                response.setContentType(f.getContentType());
+                response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+                response.setContentType("");
                 // copy it to response's OutputStream
                 IOUtils.copy(is, response.getOutputStream());
 
@@ -91,11 +97,11 @@ public class FileController {
                 response.sendError(HttpServletResponse.SC_GONE, "O arquivo solicitado não foi encontrado.");
                 LOG.error("O arquivo solicitado não foi encontrado.", fe);
             } catch (IOException ex) {
-                LOG.error("Error writing file to output stream. Filename was '" + fileName + "'");
+                LOG.error("Error writing file to output stream. Filename was '" + filename + "'");
                 throw ex;
             }
         }
-    }
+    
 
     @DeleteMapping(value = "/{id}")
     public HttpEntity<MessageDto> delete(@PathVariable("id") Integer id) {
