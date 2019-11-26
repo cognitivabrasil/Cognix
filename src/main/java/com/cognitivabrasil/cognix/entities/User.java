@@ -47,6 +47,8 @@ public class User {
     private String login;
     private String password;
     private String name;
+    private String lastName;
+    private String profession;
     /* Internal representation of permission, as a string separated bu commas */
     private String permissionsInternal;
     private String role;
@@ -83,6 +85,19 @@ public class User {
         deleted = false;
     }
 
+    public User(Integer id, String login, String password, String name, String lastName, String profession, String role, Boolean deleted) {
+        this.id = id;
+        this.login = login;
+        this.password = password;
+        this.name = name;
+        this.lastName = lastName;
+        this.profession = profession;
+        this.role = role;
+        this.deleted = deleted;
+    }
+    
+    
+    
     public User(String login, String name) {
         this.login = login;
         this.name = name;
