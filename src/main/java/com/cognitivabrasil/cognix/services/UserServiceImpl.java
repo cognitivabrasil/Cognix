@@ -111,4 +111,8 @@ public class UserServiceImpl implements UserService {
         }
         return userRep.countByRole(User.ROLE_ROOT) < 2;
     }
+    @Override
+    public User findByEmail(String email){
+        return userRep.findByEmail(email);
+    }
 }

@@ -89,4 +89,6 @@ public interface UserService {
      * @return boolean
      */
     public boolean isLastAdmin(User u);
+    
+    public User findByEmail (String email);
 }

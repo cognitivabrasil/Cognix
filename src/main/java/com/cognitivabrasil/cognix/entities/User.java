@@ -9,6 +9,7 @@
  *  ******************************************************************************/
 package com.cognitivabrasil.cognix.entities;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,9 +47,13 @@ public class User {
     private Integer id;
     private String login;
     private String password;
+    
+    private String email;
     private String name;
+    
     private String lastName;
     private String profession;
+    
     /* Internal representation of permission, as a string separated bu commas */
     private String permissionsInternal;
     private String role;
@@ -85,9 +90,9 @@ public class User {
         deleted = false;
     }
 
-    public User(Integer id, String login, String password, String name, String lastName, String profession, String role, Boolean deleted) {
+    public User(Integer id, String email, String password, String name, String lastName, String profession, String role, Boolean deleted) {
         this.id = id;
-        this.login = login;
+        this.email = email;
         this.password = password;
         this.name = name;
         this.lastName = lastName;
@@ -304,5 +309,41 @@ public class User {
             d.setOwner(null);
         }
     }
+    
+//    public List <String> getRolesString(){
+//        List<String> l =null; //new ArrayList<String>() ;
+//       // l.add(this.getRole());
+//        return l;
+//    }
+    public String getLogin() {
+        return login;
+    }
 
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getProfession() {
+        return profession;
+    }
+
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
 }
