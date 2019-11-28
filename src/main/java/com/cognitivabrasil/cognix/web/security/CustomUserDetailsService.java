@@ -41,7 +41,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             log.info("Não foi encontrado o usuário: "+username);
             return null;
         }
-        log.info("Found user " + user.getEmail());
+        log.info("Found user ");
         return new SecurityUser(user);
     }
 }

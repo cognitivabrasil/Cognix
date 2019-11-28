@@ -37,9 +37,11 @@ public class SecurityUser extends LoginUser implements UserDetails {
     public SecurityUser(User user) {
 //        log.info("entrou no metodo");
 //        log.info(user.getEmail());
-        super(user.getEmail(), user.getPassword());
+        super(user.getName(), user.getPassword());
        // log.info(user.getUsername());
-        this.roles = user.getRolesString();
+        List <String> listRole = new ArrayList<String> ();
+        listRole.add(user.getRole());
+        this.roles = listRole;
         this.enabled = true;
     }
 
@@ -89,5 +91,7 @@ public class SecurityUser extends LoginUser implements UserDetails {
     public String getUsername() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
+
+
 
 }

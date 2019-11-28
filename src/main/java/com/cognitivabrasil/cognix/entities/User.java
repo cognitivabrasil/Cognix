@@ -48,11 +48,11 @@ public class User {
     private String login;
     private String password;
     
-    private String email;
+//    private String email;
     private String name;
-    
-    private String lastName;
-    private String profession;
+//    
+//    private String lastName;
+//    private String profession;
     
     /* Internal representation of permission, as a string separated bu commas */
     private String permissionsInternal;
@@ -90,16 +90,16 @@ public class User {
         deleted = false;
     }
 
-    public User(Integer id, String email, String password, String name, String lastName, String profession, String role, Boolean deleted) {
-        this.id = id;
-        this.email = email;
-        this.password = password;
-        this.name = name;
-        this.lastName = lastName;
-        this.profession = profession;
-        this.role = role;
-        this.deleted = deleted;
-    }
+//    public User(Integer id, String email, String password, String name, String lastName, String profession, String role, Boolean deleted) {
+//        this.id = id;
+//        this.email = email;
+//        this.password = password;
+//        this.name = name;
+//        this.lastName = lastName;
+//        this.profession = profession;
+//        this.role = role;
+//        this.deleted = deleted;
+//    }
     
     
     
@@ -315,35 +315,35 @@ public class User {
 //       // l.add(this.getRole());
 //        return l;
 //    }
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getProfession() {
-        return profession;
-    }
-
-    public void setProfession(String profession) {
-        this.profession = profession;
-    }
+//    public String getLogin() {
+//        return login;
+//    }
+//
+//    public void setLogin(String login) {
+//        this.login = login;
+//    }
+//
+//    public String getEmail() {
+//        return email;
+//    }
+//
+//    public void setEmail(String email) {
+//        this.email = email;
+//    }
+//
+//    public String getLastName() {
+//        return lastName;
+//    }
+//
+//    public void setLastName(String lastName) {
+//        this.lastName = lastName;
+//    }
+//
+//    public String getProfession() {
+//        return profession;
+//    }
+//
+//    public void setProfession(String profession) {
+//        this.profession = profession;
+//    }
 }
