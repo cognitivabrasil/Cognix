@@ -52,6 +52,7 @@ public class UserDto {
         this.username = u.getUsername();
         this.name = u.getName();
         this.role = u.getRole();
+        this.password = u.getPassword();
     }
 
     public Integer getId() {

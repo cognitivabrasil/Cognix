@@ -35,10 +35,10 @@ public class SecurityUser extends LoginUser implements UserDetails {
     }
 
     public SecurityUser(User user) {
-//        log.info("entrou no metodo");
-//        log.info(user.getEmail());
-        super(user.getName(), user.getPassword());
-       // log.info(user.getUsername());
+
+        super(user.getUsername(), user.getPassword());
+                log.info("entrou no metodo");
+       log.info("Aqui " + user.getUsername() + "  " + user.getPassword());
         List <String> listRole = new ArrayList<String> ();
         listRole.add(user.getRole());
         this.roles = listRole;
@@ -87,10 +87,6 @@ public class SecurityUser extends LoginUser implements UserDetails {
         return roles;
     }
 
-    @Override
-    public String getUsername() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 
 
 

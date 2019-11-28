@@ -151,22 +151,7 @@ public class UserServiceImplITest {
         assertThat(u2.getPassword(), equalTo("c5e3539121c4944f2bbe097b425ee774"));
     }
 
-    @Test
-    public void testAuthenticate() {
-        User u = userService.authenticate("marcos", "teste");
-        assertNotNull(u);
-    }
 
-    @Test
-    @Ignore
-    public void testAuthenticateError() {
-        //TODO: depois de implementar o security remover o ignore daqui
-        assertNull(userService.authenticate("marcos", "senhaErrada"));
-
-        assertNull(userService.authenticate(null, "teste"));
-
-        assertNull(userService.authenticate("usuarioErrado", "teste"));
-    }
 
     @Test
     public void testDeletedUser() {

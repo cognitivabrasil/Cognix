@@ -16,7 +16,7 @@ package com.cognitivabrasil.cognix.web.security;
  */
 public class LoginUser {
 
-    private String email;
+    private String username;
     private String password;
 
     public LoginUser() {
@@ -24,13 +24,13 @@ public class LoginUser {
 
     
     public LoginUser(String username, String password) {
-        this.email = username;
+        this.username = username;
         this.password = password;
     }
 
 
-    public String getEmail() {
-        return this.email;
+    public String getUsername() {
+        return this.username;
     }
 
     public String getPassword() {

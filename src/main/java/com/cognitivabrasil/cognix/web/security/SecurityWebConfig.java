@@ -34,6 +34,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityWebConfig extends WebSecurityConfigurerAdapter {
 
 
+
+
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
 
@@ -57,7 +59,6 @@ public class SecurityWebConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/**").permitAll()
                 .antMatchers(HttpMethod.POST, "/**").permitAll()
                 .antMatchers(HttpMethod.PUT, "/**").permitAll();
-   
 
     }
 

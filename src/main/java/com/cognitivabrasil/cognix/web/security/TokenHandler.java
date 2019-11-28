@@ -34,11 +34,11 @@ public class TokenHandler {
     private Clock clock = DefaultClock.INSTANCE;
 
     
-        @Value("${token.expiration.hours:-1}")
-    private int hoursToExpire;
         
-          @Value("${jwt.expiration}")
-    private Long expiration;
+    private int hoursToExpire = 5;
+        
+          
+    private Long expiration= (long)604800;
 
         private final Logger log = LoggerFactory.getLogger(TokenHandler.class);
 
@@ -57,7 +57,7 @@ public class TokenHandler {
         final Date expirationDate = calculateExpirationDate(createdDate);
 
         return Jwts.builder()
-                .setSubject(user.getEmail())
+                .setSubject(user.getUsername())
                 .setExpiration(expirationDate)
                 .claim("roles", user.getRoles())
                 .signWith(SignatureAlgorithm.HS256, KEY_TOKEN)

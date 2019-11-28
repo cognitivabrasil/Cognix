@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component;
  * @author igor
  */
 @Component
-@Import(UserService.class)
+//@Import(UserService.class)
 public class CustomUserDetailsService implements UserDetailsService {
 
     @Autowired
@@ -36,12 +36,12 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.findByEmail(username);;
+        User user = userService.get(username);;
         if (user == null) {
             log.info("Não foi encontrado o usuário: "+username);
             return null;
         }
-        log.info("Found user ");
+        log.info("Found user " + user.getUsername());
         return new SecurityUser(user);
     }
 }
