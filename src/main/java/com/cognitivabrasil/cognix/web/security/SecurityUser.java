@@ -37,8 +37,6 @@ public class SecurityUser extends LoginUser implements UserDetails {
     public SecurityUser(User user) {
 
         super(user.getUsername(), user.getPassword());
-                log.info("entrou no metodo");
-       log.info("Aqui " + user.getUsername() + "  " + user.getPassword());
         List <String> listRole = new ArrayList<String> ();
         listRole.add(user.getRole());
         this.roles = listRole;

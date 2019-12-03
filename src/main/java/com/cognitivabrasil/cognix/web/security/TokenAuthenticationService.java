@@ -53,7 +53,7 @@ public class TokenAuthenticationService {
      */
     public Authentication getAuthentication(HttpServletRequest request) {
         final String token = request.getHeader(AUTH_HEADER_NAME);
-        log.debug(token);
+        //log.debug(token);
         if (isNotBlank(token)) {
             final SecurityUser user = tokenHandler.parseUserFromToken(token);
             log.debug("criou user");
