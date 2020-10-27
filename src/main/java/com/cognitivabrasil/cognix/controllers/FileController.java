@@ -23,6 +23,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Enumeration;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -47,6 +48,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  *
@@ -128,7 +131,7 @@ public class FileController {
     }
 
     @PostMapping(value = "/uploadFile")
-    public HttpEntity<String> upload(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, org.apache.commons.fileupload.FileUploadException {
+    public HttpEntity<String> upload(@RequestParam("file") MultipartFile multipartFile, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, org.apache.commons.fileupload.FileUploadException {
         if (file == null) {
             file = new Files();
             file.setSizeInBytes(0L);
@@ -141,69 +144,76 @@ public class FileController {
 
         if (isMultipart) {
             try {
-                ServletFileUpload x = new ServletFileUpload(new DiskFileItemFactory());
-                List<FileItem> items = x.parseRequest(request);
+                if (!multipartFile.isEmpty()) {
+                    // InputStream input = multipartFile.getInputStream();
+                    Enumeration<String> parameterNames = request.getParameterNames();
+ 
+                    while (parameterNames.hasMoreElements()) {
+            
+                        String paramName = parameterNames.nextElement();
+                        String paramValue = null;
+                        
+                        String[] paramValues = request.getParameterValues(paramName);
+                        for (int i = 0; i < paramValues.length; i++) {
+                            paramValue = paramValues[i];                          
+                        }
 
-                for (FileItem item : items) {
-                    InputStream input = item.getInputStream();
-
-                    // Handle a form field.
-                    if (item.isFormField()) {
-                        String attribute = item.getFieldName();
-                        String value = Streams.asString(input);
-                        LOG.error(attribute);
-                        switch (attribute) {
+                        switch (paramName) {
                             case "chunks":
-                                this.chunks = Integer.parseInt(value);
+                                this.chunks = Integer.parseInt(paramValue);
                                 break;
                             case "chunk":
-                                this.chunk = Integer.parseInt(value);
+                                this.chunk = Integer.parseInt(paramValue);
                                 break;
                             case "filename":
-                                file.setName(value);
+                                if(paramValue.equals("Material")){
+                                    file.setName(multipartFile.getOriginalFilename());
+                                }
+                                if(paramValue.equals("Thumbnail")){
+                                    file.setName("thumbnail");
+                                }
                                 break;
                             case "docId":
-                                if (value.isEmpty()) {
+                                if (paramValue.isEmpty()) {
                                     throw new org.apache.commons.fileupload.FileUploadException("Não foi informado o id do documento.");
                                 }
-                                docId = Integer.parseInt(value);
-                                docPath = Config.FILE_PATH + "/" + docId;
+                                docId = Integer.parseInt(paramValue);
+                                docPath = Config.FILE_PATH + docId;
                                 File documentPath = new File(docPath);
                                 // cria o diretorio
-                                documentPath.mkdirs();
-
+                                if(!documentPath.exists()){
+                                    documentPath.mkdirs();
+                                }
                                 break;
                             default:
                                 break;
                         }
+                    }
 
-                    } // Handle a multi-part MIME encoded file.
-                    else {
-                        try {
-
-                            File uploadFile = new File(docPath, item.getName());
-                            BufferedOutputStream bufferedOutput;
+                    
+                    try {
+                        File uploadFile = null;
+                        BufferedOutputStream bufferedOutput = null;
+                        byte[] data = null;
+                        // copy file (learning object or thumbnail)
+                        if (!multipartFile.isEmpty()) {
+                            uploadFile = new File(docPath, file.getName());
                             bufferedOutput = new BufferedOutputStream(new FileOutputStream(uploadFile, true));
-
-                            byte[] data = item.get();
+                            data = multipartFile.getBytes();
                             bufferedOutput.write(data);
                             bufferedOutput.close();
-                        } catch (Exception e) {
-                            LOG.error("Erro ao salvar o arquivo.", e);
-                            file = null;
-                            throw e;
-                        } finally {
-                            if (input != null) {
-                                try {
-                                    input.close();
-                                } catch (IOException e) {
-                                    LOG.error("Erro ao fechar o ImputStream", e);
-                                }
+                        }
+                    } catch (Exception e) {
+                        LOG.error("Erro ao salvar o arquivo.", e);
+                        file = null;
+                        throw e;
+                    } finally {
+                        if (!multipartFile.isEmpty()) {
+                            if(!file.getName().equals("thumbnail")){
+                                file.setName(multipartFile.getOriginalFilename());
                             }
-
-                            file.setName(item.getName());
-                            file.setContentType(item.getContentType());
-                            file.setPartialSize(item.getSize());
+                            file.setContentType(multipartFile.getContentType());
+                            file.setPartialSize(multipartFile.getSize());
                         }
                     }
                 }
@@ -226,7 +236,6 @@ public class FileController {
         else {
             responseString = RESP_ERROR;
         }
-
         response.setContentType("application/json");
         byte[] responseBytes = responseString.getBytes();
         response.setContentLength(responseBytes.length);
@@ -238,7 +247,6 @@ public class FileController {
 
     @GetMapping(value = "/{id}/thumbnail")
     public void getThumbnail(@PathVariable("id") Long id, HttpServletResponse response) throws IOException {
-
         if (id == null || id == 0) {
             response.sendError(HttpServletResponse.SC_NOT_FOUND, "O arquivo solicitado não foi encontrado.");
         } else {
@@ -257,9 +265,7 @@ public class FileController {
 
             } catch (FileNotFoundException fe) {
                 // get your file as InputStream
-
                 InputStream is = new FileInputStream(new File(DEFAULT_THUMBNAIL_PATH));
-
                 response.setHeader("Content-Disposition", "attachment; filename=default-thumbnail.png");
                 response.setContentType(MediaType.IMAGE_PNG_VALUE);
                 response.setStatus(HttpServletResponse.SC_CREATED);
